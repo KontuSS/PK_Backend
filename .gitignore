@@ -1,4 +1,4 @@
 /.vscode
-/bin
-/obj
-/wwwroot
+/WebAppBackend/obj
+/WebAppBackend/bin
+/WebAppBackend/wwwroot
