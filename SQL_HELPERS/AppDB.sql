@@ -1,7 +1,7 @@
 -- USERS podstawowe info
 CREATE TABLE users (
   id              serial PRIMARY KEY,
-  email           citext UNIQUE NOT NULL,
+  email           text UNIQUE NOT NULL,
   password_hash   text NOT NULL,
   first_name      text NOT NULL,
   last_name       text NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE user_profile_photo (
   user_id      serial REFERENCES users(id) ON DELETE CASCADE,
   file_name    text NOT NULL,-- nwm czy potrzeba zostawilem dla pewnosci
   file_data    bytea NOT NULL,-- tu jest przechowywany sam plik
-  type    text CHECK (mime_type IN ('image/jpeg', 'image/jpg', 'image/png', 'image/webp')),
+  type    text CHECK (type IN ('image/jpeg', 'image/jpg', 'image/png', 'image/webp')),
   uploaded_at  timestamptz DEFAULT now()
 );
 
@@ -31,8 +31,9 @@ CREATE TABLE intrests (
 
 CREATE TABLE user_interests (
   user_id       serial PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-  category_ids  serial[],
-  CHECK (cardinality(category_ids) = cardinality(ARRAY(SELECT DISTINCT unnest(category_ids))))--sprawdza czy nie ma powtorek przetestowac czy dziala
+  category_ids  integer[]
+  --CHECK (cardinality(category_ids) = cardinality(ARRAY(SELECT DISTINCT unnest(category_ids))))--sprawdza czy nie ma powtorek przetestowac czy dziala
+  --do dodania przez backend
 );
 
 
@@ -51,14 +52,16 @@ CREATE TABLE friend_requests ( --podstawowa wersja odnoszaca sie do zaproszen mi
 
 CREATE TABLE user_friends (-- vektor z id uzytkownikow przyjaciol
   user_id   serial PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-  friends   serial[] NOT NULL DEFAULT '{}',
-   CHECK (cardinality(friends) = cardinality(ARRAY(SELECT DISTINCT unnest(friends))))--sprawdza czy nie ma powtorek przetestowac czy dziala
+  friends   integer[] NOT NULL DEFAULT '{}'
+  -- CHECK (cardinality(friends) = cardinality(ARRAY(SELECT DISTINCT unnest(friends))))--sprawdza czy nie ma powtorek przetestowac czy dziala
+   --do dodania przez backend
 );
 
 CREATE TABLE user_blocked (-- vektor z id uzytkownikow zablokowanych
   user_id       serial PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-  blocked_users serial[] NOT NULL DEFAULT '{}',
-  CHECK (    cardinality(blocked_users) = cardinality(ARRAY(SELECT DISTINCT unnest(blocked_users)))  )--sprawdza czy nie ma powtorek przetestowac czy dziala
+  blocked_users integer[] NOT NULL DEFAULT '{}'
+  --CHECK (    cardinality(blocked_users) = cardinality(ARRAY(SELECT DISTINCT unnest(blocked_users)))  )--sprawdza czy nie ma powtorek przetestowac czy dziala
+   --do dodania przez backend
 );
 
 
@@ -69,7 +72,7 @@ CREATE TABLE conversations (--nie zakładamy na tym etapie grup czatów
   user1_id        serial REFERENCES users(id),
   user2_id        serial REFERENCES users(id),
   created_at      timestamptz NOT NULL DEFAULT now(),
-  CHECK (user1_id < user2_id);          -- wymuszenie braku symentrycznosci
+  CHECK (user1_id < user2_id),          -- wymuszenie braku symentrycznosci
   UNIQUE (user1_id, user2_id)
 );
 
@@ -110,14 +113,14 @@ CREATE TABLE repository_metadata (
 CREATE TABLE repo_entries (
   id              serial PRIMARY KEY,
   name            text NOT NULL,
-  repository_id   uuid REFERENCES repositories(id) ON DELETE CASCADE,
-  parent_id       uuid REFERENCES repo_entries(id) ON DELETE CASCADE DEFAULT NULL,
+  repository_id   serial REFERENCES repositories(id) ON DELETE CASCADE,
+  parent_id       integer REFERENCES repo_entries(id) ON DELETE CASCADE
 );
 
 CREATE TABLE repo_entries_data (
   entry_id        serial PRIMARY KEY REFERENCES repo_entries(id) ON DELETE CASCADE,
   is_directory    boolean NOT NULL DEFAULT false,
-  extension       text CHECK (extension IN ('txt', 'py', 'java', 'cpp', 'js', 'html', 'css', 'json', 'xml')) DEFAULT NULL,
+  extension       text CHECK (extension IN ('txt', 'py', 'java', 'cpp', 'js', 'html', 'css', 'json', 'xml','md','kt')) DEFAULT NULL,
   content         text,
   number_of_lines integer,
   size            integer,

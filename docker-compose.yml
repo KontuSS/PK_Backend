@@ -13,6 +13,7 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./SQL_HELPERS:/temp/SQL_HELPERS
 
 volumes:
   pgdata:
