@@ -1,5 +1,5 @@
 
-
+--aktualnie skrypt nie dodadje przykładowych danych do tabeli TokenizedCodes,ComparisonResults-po storonie systemu antyplagiatowego oraz do repo_entries_metadata
 BEGIN;
 
 INSERT INTO intrests (id, name, description) VALUES

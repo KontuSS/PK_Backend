@@ -132,20 +132,21 @@ CREATE TABLE repo_entries_data (
 
 
 
--- Tabele zwiazane z plagiatami do zrobienia po wymysleniu mechanizmu antyplagiatowego 
+-- Tabele zwiazane z plagiatami
+CREATE TABLE TokenizedCodes (
+    id SERIAL PRIMARY KEY,
+    EntryID INTEGER REFERENCES repo_entries(id) ON DELETE CASCADE NOT NULL,
+    TokenSequence TEXT NOT NULL,          -- Sekwencja tokenów
+    NormalizedTokenSequence TEXT NOT NULL, -- Znormalizowane tokeny
+    FolderPath VARCHAR(512)  -- Ścieżka do katalogu
+);
 
--- CREATE TABLE plagiarism_log (
---   id               bigserial PRIMARY KEY,
---   file_a_id        uuid REFERENCES code_files(id),
---   file_b_id        uuid REFERENCES code_files(id),
---   similarity_pct   numeric(5,2),
---   detected_at      timestamptz DEFAULT now(),
---   CONSTRAINT uniq_pair UNIQUE (file_a_id, file_b_id)
--- );
-
--- -- pgvector – przechowujemy wektor preferencji  (np. 128‑dimensional)
--- ALTER TABLE users
---   ADD COLUMN prefs_vec vector(128);
-
--- CREATE INDEX idx_users_prefs_vec ON users USING ivfflat (prefs_vec vector_cosine_ops);
-
+CREATE TABLE ComparisonResults (
+    Id SERIAL PRIMARY KEY,
+    Code1Id INTEGER REFERENCES TokenizedCodes(id) ON DELETE CASCADE NOT NULL,
+    Code2Id INTEGER REFERENCES TokenizedCodes(id) ON DELETE CASCADE NOT NULL,
+    User1   INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,--pierwszy wyslal kod
+    User2   INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL,--drugi wyslal kod
+    SimilarityScore DOUBLE PRECISION NOT NULL -- Wynik podobieństwa (0-1)
+ 
+);
