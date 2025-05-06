@@ -11,7 +11,7 @@ project-root/
 ├── code-service/            # Dodawanie i analiza kodu
 ├── plagiarism-service/      # Serwis antyplagiatowy
 ├── docker/                  # Konfiguracje dla kontenerów
-├── docker-compose.yml       # Główna orkiestracja
+└── docker-compose.yml       # Główna orkiestracja
 .gitignore
 README.md
 ```
