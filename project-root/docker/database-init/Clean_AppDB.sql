@@ -1,0 +1,1 @@
+TRUNCATE TABLE users, user_profile_photo, intrests, user_interests, friend_requests, user_friends, user_blocked, conversations, messages, repositories, repository_metadata, repo_entries, repo_entries_data,TokenizedCodes,ComparisonResults RESTART IDENTITY CASCADE;

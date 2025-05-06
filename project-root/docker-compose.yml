@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: appdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    restart: always
+    ports:
+      - "6379:6379"
+
+  user-service:
+    build: ./user-service
+    ports:
+      - "3001:3000"
+    environment:
+      DB_URL: postgres://user:password@postgres:5432/appdb
+    depends_on:
+      - postgres
+
+  matching-service:
+    build: ./matching-service
+    ports:
+      - "3002:3000"
+
+  chat-service:
+    build: ./chat-service
+    ports:
+      - "3003:3000"
+    environment:
+      REDIS_URL: redis://redis:6379
+
+  code-service:
+    build: ./code-service
+    ports:
+      - "3004:3000"
+
+  plagiarism-service:
+    build: ./plagiarism-service
+    ports:
+      - "3005:3000"
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "3000:3000"
+    depends_on:
+      - user-service
+      - chat-service
+      - matching-service
+      - code-service
+      - plagiarism-service
+
+volumes:
+  pgdata:
