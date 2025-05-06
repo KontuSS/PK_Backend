@@ -1,6 +1,6 @@
 # PK_Backend
 
-project-root/
+````project-root/
 ├── api-gateway/ # Backend for Frontend
 ├── user-service/ # Zarządzanie użytkownikami
 ├── matching-service/ # Algorytm dopasowań
@@ -9,4 +9,5 @@ project-root/
 ├── plagiarism-service/ # Serwis antyplagiatowy
 ├── docker/ # Konfiguracje dla kontenerów
 ├── docker-compose.yml # Główna orkiestracja
-└── README.md
+└── README.md```
+````
