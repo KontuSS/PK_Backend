@@ -1,1 +1,63 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+dist/
+.cache/
+coverage/
+.env
+.env.* # np. .env.local, .env.test
 
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# VSCode
+.vscode/
+
+# Docker
+docker/postgres-init/*.sql
+*.local.yml
+docker-compose.override.yml
+
+# Prisma (jeśli używane)
+prisma/dev.db
+prisma/migrations/
+*.db-journal
+
+# Redis dump
+dump.rdb
+
+# Jest test output
+test-results/
+test-output/
+jest-*
+
+# Optional frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.next/
+frontend/.turbo/
+frontend/.env
+
+# E2E tools
+playwright-report/
+cypress/videos/
+cypress/screenshots/
+
+# Misc
+*.swp
+*.swo
+.idea/
