@@ -1,8 +1,10 @@
-import { Controller } from '@nestjs/common';
+/* eslint-disable prettier/prettier */
+import { Controller, Post, Body } from '@nestjs/common';
+import { PlagiarismService } from './plagiarism.service';
 
 @Controller('plagiarism')
 export class PlagiarismController {
-  constructor(private readonly plagiarismService: PlagiarismService) {}
+  constructor(private readonly plagiarismService : PlagiarismService) {}
 
   @Post('check')
   check(@Body() body: { codeA: string, codeB: string }) {
