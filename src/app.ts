@@ -1,35 +1,23 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
-import { secureHeaders } from 'hono/secure-headers';
-
-// Routes
 import authRoutes from './routes/auth.route.js';
-import codeRoutes from './routes/code.route.js';
-import matchingRoutes from './routes/match.route.js';
-import videoRoutes from './routes/chat.route.js';
-
-// Database connection
-import { connectDb } from './config/db.js';
+import userRoutes from './routes/user.route.js';
 
 const app = new Hono();
 
 // Middlewares
 app.use('*', logger());
-app.use('*', cors());
-app.use('*', secureHeaders());
+app.use('*', cors({
+  origin: ['http://localhost:3000'], // Your frontend URL
+  credentials: true,
+}));
 
-// Connect to database
-connectDb();
-
-// Register routes
+// Routes
 app.route('/auth', authRoutes);
-app.route('/code', codeRoutes);
-app.route('/match', matchingRoutes);
-app.route('/video', videoRoutes);
+app.route('/users', userRoutes);
+
+// Health check
+app.get('/', (c) => c.text('API is running'));
 
 export default app;
-
-// App logic path:
-// App -> route -> controllers -> services
-// model <-> database

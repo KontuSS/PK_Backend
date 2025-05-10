@@ -1,5 +1,6 @@
 import { Pool } from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
+import * as schema from '../models/schema.js';
 
 const pool = new Pool({
   host: 'localhost',
@@ -9,4 +10,5 @@ const pool = new Pool({
   database: 'appdb',
 });
 
-export const db = drizzle(pool);
+export const db = drizzle(pool, { schema });
+export type DbType = typeof db;
