@@ -1,6 +1,7 @@
 import { db } from '../config/db.js';
 import { users } from '../models/schema.js';
 import { eq } from 'drizzle-orm';
+// import type { UserProfile, UserProfileUpdate } from '../types/users.types.js';
 
 export class UserService {
   static async getProfile(userId: number) {
