@@ -1,0 +1,282 @@
+1. app.ts (Application Entry Point)
+Purpose: The main application configuration file that ties everything together.
+
+Key Components:
+
+Creates the Hono application instance
+
+Sets up global middleware (CORS, logging, security headers)
+
+Connects to the database
+
+Registers all route handlers
+
+How it connects:
+
+Imports route handlers from routes/
+
+Uses middleware from middlewares/
+
+Initializes database connection from config/db.ts
+
+2. config/ (Configuration Files)
+Purpose: Contains all application configurations.
+
+Files:
+
+db.ts: PostgreSQL database connection setup using Drizzle ORM
+
+constants.ts: Application-wide constants (JWT secrets, API keys)
+
+redis.ts (optional): Redis configuration for caching/sessions
+
+How it connects:
+
+Imported by services and controllers that need database access
+
+Constants are used throughout the application
+
+3. controllers/ (Route Handlers)
+Purpose: Handle HTTP requests and responses.
+
+Example Files:
+
+auth.controller.ts: User registration/login endpoints
+
+code.controller.ts: Code submission/retrieval endpoints
+
+matching.controller.ts: User matching logic endpoints
+
+video.controller.ts: Video chat session management
+
+How they work:
+
+Receive HTTP requests
+
+Validate input (using middlewares)
+
+Call appropriate services
+
+Return HTTP responses
+
+How they connect:
+
+Use services from services/
+
+Protected by middlewares from middlewares/
+
+Registered in routes from routes/
+
+4. middlewares/ (Request Processors)
+Purpose: Process requests before they reach controllers.
+
+Key Middlewares:
+
+auth.middleware.ts: JWT authentication
+
+validation.middleware.ts: Request payload validation
+
+role.middleware.ts (optional): Role-based access control
+
+How they work:
+
+Execute before controllers
+
+Can modify requests or block unauthorized access
+
+Add context to requests (e.g., authenticated user)
+
+How they connect:
+
+Applied in app.ts or individual routes
+
+Used by controllers to validate requests
+
+5. models/ (Database Schema)
+Purpose: Define database tables and relationships.
+
+Example Models:
+
+user.model.ts: User account schema
+
+code.model.ts: Code submissions schema
+
+match.model.ts: User matches schema
+
+chat.model.ts: Video chat sessions schema
+
+How they work:
+
+Define tables using Drizzle ORM syntax
+
+Specify columns, relationships, and constraints
+
+How they connect:
+
+Used by services for database operations
+
+Imported in config/db.ts for Drizzle setup
+
+6. routes/ (Route Definitions)
+Purpose: Organize API endpoints.
+
+Example Files:
+
+auth.route.ts: /auth/login, /auth/register
+
+code.route.ts: /code/submit, /code/:id
+
+matching.route.ts: /match/find, /match/swipe
+
+video.route.ts: /video/session, /video/token
+
+How they work:
+
+Group related endpoints
+
+Apply specific middlewares
+
+Connect controllers to paths
+
+How they connect:
+
+Import controllers from controllers/
+
+Registered in app.ts
+
+7. services/ (Business Logic)
+Purpose: Contain core application logic.
+
+Key Services:
+
+auth.service.ts: User authentication logic
+
+code.service.ts: Code submission handling
+
+plagiarism.service.ts: Code similarity detection
+
+matching.service.ts: User matching algorithm
+
+video.service.ts: Video chat session management
+
+How they work:
+
+Perform complex operations
+
+Handle database interactions
+
+Implement business rules
+
+How they connect:
+
+Called by controllers
+
+Use models for database operations
+
+May use other services
+
+8. types/ (Type Definitions)
+Purpose: TypeScript type declarations.
+
+Example Files:
+
+auth.types.ts: Auth request/response types
+
+code.types.ts: Code submission types
+
+matching.types.ts: Matching algorithm types
+
+How they connect:
+
+Used throughout the application for type safety
+
+Imported by controllers, services, and middlewares
+
+9. utils/ (Helper Functions)
+Purpose: Reusable utility functions.
+
+Example Utilities:
+
+api.utils.ts: API response formatters
+
+code.utils.ts: Code analysis helpers
+
+matching.utils.ts: Matching score calculators
+
+How they connect:
+
+Used by services and controllers
+
+Provide common functionality
+
+
+Data Flow Through the System
+Request Comes In
+
+app.ts receives HTTP request
+
+Applies global middlewares
+
+Route Handling
+
+Routes in routes/ direct to controllers
+
+Route-specific middlewares execute
+
+Controller Processing
+
+Controllers in controllers/:
+
+Validate input
+
+Call services
+
+Format responses
+
+Service Execution
+
+Services in services/:
+
+Implement business logic
+
+Interact with database via models
+
+Call other services if needed
+
+Database Interaction
+
+Models in models/ define schema
+
+Services use Drizzle ORM to query data
+
+Response Returned
+
+Controllers return formatted responses
+
+Middlewares can process responses
+
+
+Key Integration Points
+Database Connection
+
+Initialized in config/db.ts
+
+Used by all services
+
+Authentication
+
+auth.middleware.ts protects routes
+
+auth.service.ts handles credentials
+
+Real-time Features
+
+Video chat services use WebSocket connections
+
+Matching services use database polling/events
+
+Error Handling
+
+Consistent error formats from utils/
+
+Handled globally in app.ts

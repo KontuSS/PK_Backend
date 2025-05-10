@@ -1,0 +1,1582 @@
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "prevId": "",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password_hash": {
+          "name": "password_hash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "first_name": {
+          "name": "first_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "last_name": {
+          "name": "last_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nick": {
+          "name": "nick",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "bio": {
+          "name": "bio",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "age": {
+          "name": "age",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_email_key": {
+          "columns": [
+            "email"
+          ],
+          "nullsNotDistinct": false,
+          "name": "users_email_key"
+        },
+        "users_nick_key": {
+          "columns": [
+            "nick"
+          ],
+          "nullsNotDistinct": false,
+          "name": "users_nick_key"
+        }
+      },
+      "checkConstraints": {
+        "users_age_check": {
+          "name": "users_age_check",
+          "value": "age >= 8"
+        }
+      },
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.user_profile_photo": {
+      "name": "user_profile_photo",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "file_name": {
+          "name": "file_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "file_data": {
+          "name": "file_data",
+          "type": "bytea",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "uploaded_at": {
+          "name": "uploaded_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "user_profile_photo_user_id_fkey": {
+          "name": "user_profile_photo_user_id_fkey",
+          "tableFrom": "user_profile_photo",
+          "tableTo": "users",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "user_profile_photo_type_check": {
+          "name": "user_profile_photo_type_check",
+          "value": "type = ANY (ARRAY['image/jpeg'::text, 'image/jpg'::text, 'image/png'::text, 'image/webp'::text])"
+        }
+      },
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.intrests": {
+      "name": "intrests",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "intrests_name_key": {
+          "columns": [
+            "name"
+          ],
+          "nullsNotDistinct": false,
+          "name": "intrests_name_key"
+        }
+      },
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.friend_requests": {
+      "name": "friend_requests",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "sender_id": {
+          "name": "sender_id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "receiver_id": {
+          "name": "receiver_id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "message": {
+          "name": "message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pending'"
+        },
+        "sent_at": {
+          "name": "sent_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "friend_requests_sender_id_fkey": {
+          "name": "friend_requests_sender_id_fkey",
+          "tableFrom": "friend_requests",
+          "tableTo": "users",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "sender_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "friend_requests_receiver_id_fkey": {
+          "name": "friend_requests_receiver_id_fkey",
+          "tableFrom": "friend_requests",
+          "tableTo": "users",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "receiver_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "friend_requests_sender_id_receiver_id_key": {
+          "columns": [
+            "sender_id",
+            "receiver_id"
+          ],
+          "nullsNotDistinct": false,
+          "name": "friend_requests_sender_id_receiver_id_key"
+        }
+      },
+      "checkConstraints": {
+        "friend_requests_status_check": {
+          "name": "friend_requests_status_check",
+          "value": "status = ANY (ARRAY['pending'::text, 'accepted'::text, 'rejected'::text])"
+        },
+        "friend_requests_check": {
+          "name": "friend_requests_check",
+          "value": "sender_id <> receiver_id"
+        }
+      },
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.user_interests": {
+      "name": "user_interests",
+      "schema": "",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "category_ids": {
+          "name": "category_ids",
+          "type": "integer[]",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "user_interests_user_id_fkey": {
+          "name": "user_interests_user_id_fkey",
+          "tableFrom": "user_interests",
+          "tableTo": "users",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.user_friends": {
+      "name": "user_friends",
+      "schema": "",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "friends": {
+          "name": "friends",
+          "type": "integer[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "user_friends_user_id_fkey": {
+          "name": "user_friends_user_id_fkey",
+          "tableFrom": "user_friends",
+          "tableTo": "users",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.user_blocked": {
+      "name": "user_blocked",
+      "schema": "",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "blocked_users": {
+          "name": "blocked_users",
+          "type": "integer[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "user_blocked_user_id_fkey": {
+          "name": "user_blocked_user_id_fkey",
+          "tableFrom": "user_blocked",
+          "tableTo": "users",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.conversations": {
+      "name": "conversations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user1_id": {
+          "name": "user1_id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user2_id": {
+          "name": "user2_id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "conversations_user1_id_fkey": {
+          "name": "conversations_user1_id_fkey",
+          "tableFrom": "conversations",
+          "tableTo": "users",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "user1_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "conversations_user2_id_fkey": {
+          "name": "conversations_user2_id_fkey",
+          "tableFrom": "conversations",
+          "tableTo": "users",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "user2_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "conversations_user1_id_user2_id_key": {
+          "columns": [
+            "user1_id",
+            "user2_id"
+          ],
+          "nullsNotDistinct": false,
+          "name": "conversations_user1_id_user2_id_key"
+        }
+      },
+      "checkConstraints": {
+        "conversations_check": {
+          "name": "conversations_check",
+          "value": "user1_id < user2_id"
+        }
+      },
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.messages": {
+      "name": "messages",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "conversation_id": {
+          "name": "conversation_id",
+          "type": "bigserial",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sender_id": {
+          "name": "sender_id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "receiver_id": {
+          "name": "receiver_id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "message_type": {
+          "name": "message_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "content": {
+          "name": "content",
+          "type": "bytea",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sent_at": {
+          "name": "sent_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "is_read": {
+          "name": "is_read",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "messages_conversation_id_fkey": {
+          "name": "messages_conversation_id_fkey",
+          "tableFrom": "messages",
+          "tableTo": "conversations",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "conversation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "messages_sender_id_fkey": {
+          "name": "messages_sender_id_fkey",
+          "tableFrom": "messages",
+          "tableTo": "users",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "sender_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "messages_receiver_id_fkey": {
+          "name": "messages_receiver_id_fkey",
+          "tableFrom": "messages",
+          "tableTo": "users",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "receiver_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "messages_message_type_check": {
+          "name": "messages_message_type_check",
+          "value": "message_type = ANY (ARRAY['text'::text, 'image/JPEG'::text, 'image/JPG'::text, 'image/PNG'::text, 'image/WEBP'::text, 'link'::text, 'voice'::text, 'file/TXT'::text, 'folder'::text, 'ZIP'::text])"
+        }
+      },
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.repositories": {
+      "name": "repositories",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "repositories_user_id_fkey": {
+          "name": "repositories_user_id_fkey",
+          "tableFrom": "repositories",
+          "tableTo": "users",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "repositories_user_id_name_key": {
+          "columns": [
+            "user_id",
+            "name"
+          ],
+          "nullsNotDistinct": false,
+          "name": "repositories_user_id_name_key"
+        }
+      },
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.repository_metadata": {
+      "name": "repository_metadata",
+      "schema": "",
+      "columns": {
+        "repository_id": {
+          "name": "repository_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "total_files": {
+          "name": "total_files",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "total_folders": {
+          "name": "total_folders",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "total_size": {
+          "name": "total_size",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "last_modified": {
+          "name": "last_modified",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "license": {
+          "name": "license",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "visibility": {
+          "name": "visibility",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'private'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "repository_metadata_repository_id_fkey": {
+          "name": "repository_metadata_repository_id_fkey",
+          "tableFrom": "repository_metadata",
+          "tableTo": "repositories",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "repository_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "repository_metadata_visibility_check": {
+          "name": "repository_metadata_visibility_check",
+          "value": "visibility = ANY (ARRAY['public'::text, 'private'::text])"
+        }
+      },
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.repo_entries": {
+      "name": "repo_entries",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "repository_id": {
+          "name": "repository_id",
+          "type": "serial",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "parent_id": {
+          "name": "parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "repo_entries_repository_id_fkey": {
+          "name": "repo_entries_repository_id_fkey",
+          "tableFrom": "repo_entries",
+          "tableTo": "repositories",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "repository_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "repo_entries_parent_id_fkey": {
+          "name": "repo_entries_parent_id_fkey",
+          "tableFrom": "repo_entries",
+          "tableTo": "repo_entries",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.comparisonresults": {
+      "name": "comparisonresults",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "code1id": {
+          "name": "code1id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "code2id": {
+          "name": "code2id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user1": {
+          "name": "user1",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user2": {
+          "name": "user2",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "similarityscore": {
+          "name": "similarityscore",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "comparisonresults_code1id_fkey": {
+          "name": "comparisonresults_code1id_fkey",
+          "tableFrom": "comparisonresults",
+          "tableTo": "tokenizedcodes",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "code1id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "comparisonresults_code2id_fkey": {
+          "name": "comparisonresults_code2id_fkey",
+          "tableFrom": "comparisonresults",
+          "tableTo": "tokenizedcodes",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "code2id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "comparisonresults_user1_fkey": {
+          "name": "comparisonresults_user1_fkey",
+          "tableFrom": "comparisonresults",
+          "tableTo": "users",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "user1"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "comparisonresults_user2_fkey": {
+          "name": "comparisonresults_user2_fkey",
+          "tableFrom": "comparisonresults",
+          "tableTo": "users",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "user2"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.repo_entries_data": {
+      "name": "repo_entries_data",
+      "schema": "",
+      "columns": {
+        "entry_id": {
+          "name": "entry_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "is_directory": {
+          "name": "is_directory",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "extension": {
+          "name": "extension",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "number_of_lines": {
+          "name": "number_of_lines",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "size": {
+          "name": "size",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_modified": {
+          "name": "last_modified",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "repo_entries_data_entry_id_fkey": {
+          "name": "repo_entries_data_entry_id_fkey",
+          "tableFrom": "repo_entries_data",
+          "tableTo": "repo_entries",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "entry_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "repo_entries_data_extension_check": {
+          "name": "repo_entries_data_extension_check",
+          "value": "extension = ANY (ARRAY['txt'::text, 'py'::text, 'java'::text, 'cpp'::text, 'js'::text, 'html'::text, 'css'::text, 'json'::text, 'xml'::text, 'md'::text, 'kt'::text])"
+        },
+        "repo_entries_data_check": {
+          "name": "repo_entries_data_check",
+          "value": "((is_directory = true) AND (extension IS NULL) AND (content IS NULL) AND (number_of_lines IS NULL)) OR (is_directory = false)"
+        },
+        "repo_entries_data_size_check": {
+          "name": "repo_entries_data_size_check",
+          "value": "size >= 0"
+        }
+      },
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.tokenizedcodes": {
+      "name": "tokenizedcodes",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "entryid": {
+          "name": "entryid",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tokensequence": {
+          "name": "tokensequence",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "normalizedtokensequence": {
+          "name": "normalizedtokensequence",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "folderpath": {
+          "name": "folderpath",
+          "type": "varchar(512)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "tokenizedcodes_entryid_fkey": {
+          "name": "tokenizedcodes_entryid_fkey",
+          "tableFrom": "tokenizedcodes",
+          "tableTo": "repo_entries",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "entryid"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {
+    "public.interest_categories": {
+      "name": "interest_categories",
+      "schema": "public",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "isExisting": false,
+      "definition": "SELECT id, name, description FROM intrests ORDER BY name",
+      "materialized": false
+    },
+    "public.user_with_interests": {
+      "name": "user_with_interests",
+      "schema": "public",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nick": {
+          "name": "nick",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "first_name": {
+          "name": "first_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_name": {
+          "name": "last_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "interest_ids": {
+          "name": "interest_ids",
+          "type": "integer[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "interest_names": {
+          "name": "interest_names",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "isExisting": false,
+      "definition": "SELECT u.id AS user_id, u.nick, u.first_name, u.last_name, ui.category_ids AS interest_ids, array_agg(i.name) FILTER (WHERE i.id IS NOT NULL) AS interest_names FROM users u LEFT JOIN user_interests ui ON u.id = ui.user_id LEFT JOIN LATERAL unnest(ui.category_ids) interest_id(interest_id) ON true LEFT JOIN intrests i ON interest_id.interest_id = i.id WHERE u.is_active = true GROUP BY u.id, u.nick, u.first_name, u.last_name, ui.category_ids",
+      "materialized": false
+    },
+    "public.pending_friend_requests": {
+      "name": "pending_friend_requests",
+      "schema": "public",
+      "columns": {
+        "request_id": {
+          "name": "request_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sender_id": {
+          "name": "sender_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sender_nick": {
+          "name": "sender_nick",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sender_first_name": {
+          "name": "sender_first_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sender_last_name": {
+          "name": "sender_last_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "receiver_id": {
+          "name": "receiver_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "receiver_nick": {
+          "name": "receiver_nick",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "receiver_first_name": {
+          "name": "receiver_first_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "receiver_last_name": {
+          "name": "receiver_last_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "message": {
+          "name": "message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sent_at": {
+          "name": "sent_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "isExisting": false,
+      "definition": "SELECT fr.id AS request_id, fr.sender_id, s.nick AS sender_nick, s.first_name AS sender_first_name, s.last_name AS sender_last_name, fr.receiver_id, r.nick AS receiver_nick, r.first_name AS receiver_first_name, r.last_name AS receiver_last_name, fr.message, fr.status, fr.sent_at FROM friend_requests fr JOIN users s ON fr.sender_id = s.id JOIN users r ON fr.receiver_id = r.id WHERE fr.status = 'pending'::text",
+      "materialized": false
+    },
+    "public.user_friends_view": {
+      "name": "user_friends_view",
+      "schema": "public",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_nick": {
+          "name": "user_nick",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "friend_id": {
+          "name": "friend_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "friend_nick": {
+          "name": "friend_nick",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "friend_first_name": {
+          "name": "friend_first_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "friend_last_name": {
+          "name": "friend_last_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "isExisting": false,
+      "definition": "SELECT uf.user_id, u.nick AS user_nick, unnest(uf.friends) AS friend_id, f.nick AS friend_nick, f.first_name AS friend_first_name, f.last_name AS friend_last_name FROM user_friends uf JOIN users u ON uf.user_id = u.id JOIN users f ON f.id = ANY (uf.friends) WHERE u.is_active = true AND f.is_active = true",
+      "materialized": false
+    },
+    "public.user_blocked_view": {
+      "name": "user_blocked_view",
+      "schema": "public",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user_nick": {
+          "name": "user_nick",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "blocked_id": {
+          "name": "blocked_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "blocked_nick": {
+          "name": "blocked_nick",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "blocked_first_name": {
+          "name": "blocked_first_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "blocked_last_name": {
+          "name": "blocked_last_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "isExisting": false,
+      "definition": "SELECT ub.user_id, u.nick AS user_nick, unnest(ub.blocked_users) AS blocked_id, b.nick AS blocked_nick, b.first_name AS blocked_first_name, b.last_name AS blocked_last_name FROM user_blocked ub JOIN users u ON ub.user_id = u.id JOIN users b ON b.id = ANY (ub.blocked_users)",
+      "materialized": false
+    },
+    "public.user_conversations": {
+      "name": "user_conversations",
+      "schema": "public",
+      "columns": {
+        "conversation_id": {
+          "name": "conversation_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "other_user_id": {
+          "name": "other_user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "other_user_nick": {
+          "name": "other_user_nick",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_message_at": {
+          "name": "last_message_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "unread_count": {
+          "name": "unread_count",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "isExisting": false,
+      "definition": "SELECT c.id AS conversation_id, CASE WHEN c.user1_id = u.id THEN c.user2_id ELSE c.user1_id END AS other_user_id, ( SELECT users.nick FROM users WHERE users.id = CASE WHEN c.user1_id = u.id THEN c.user2_id ELSE c.user1_id END) AS other_user_nick, c.created_at, ( SELECT max(messages.sent_at) AS max FROM messages WHERE messages.conversation_id = c.id) AS last_message_at, ( SELECT count(*) AS count FROM messages WHERE messages.conversation_id = c.id AND messages.is_read = false AND messages.receiver_id = u.id) AS unread_count FROM conversations c CROSS JOIN users u WHERE u.id = c.user1_id OR u.id = c.user2_id",
+      "materialized": false
+    },
+    "public.conversation_messages": {
+      "name": "conversation_messages",
+      "schema": "public",
+      "columns": {
+        "message_id": {
+          "name": "message_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "conversation_id": {
+          "name": "conversation_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sender_id": {
+          "name": "sender_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sender_nick": {
+          "name": "sender_nick",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "receiver_id": {
+          "name": "receiver_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "receiver_nick": {
+          "name": "receiver_nick",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "message_type": {
+          "name": "message_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "text_content": {
+          "name": "text_content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "binary_content": {
+          "name": "binary_content",
+          "type": "bytea",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sent_at": {
+          "name": "sent_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_read": {
+          "name": "is_read",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "isExisting": false,
+      "definition": "SELECT m.id AS message_id, m.conversation_id, m.sender_id, s.nick AS sender_nick, m.receiver_id, r.nick AS receiver_nick, m.message_type, CASE WHEN m.message_type = 'text'::text THEN convert_from(m.content, 'UTF-8'::name) ELSE NULL::text END AS text_content, m.content AS binary_content, m.sent_at, m.is_read FROM messages m JOIN users s ON m.sender_id = s.id JOIN users r ON m.receiver_id = r.id ORDER BY m.sent_at",
+      "materialized": false
+    },
+    "public.high_similarity_codes": {
+      "name": "high_similarity_codes",
+      "schema": "public",
+      "columns": {
+        "comparison_id": {
+          "name": "comparison_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "similarityscore": {
+          "name": "similarityscore",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "entry1_id": {
+          "name": "entry1_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "file1_name": {
+          "name": "file1_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "entry2_id": {
+          "name": "entry2_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "file2_name": {
+          "name": "file2_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user1_id": {
+          "name": "user1_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user1_nick": {
+          "name": "user1_nick",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user2_id": {
+          "name": "user2_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "user2_nick": {
+          "name": "user2_nick",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "isExisting": false,
+      "definition": "SELECT cr.id AS comparison_id, cr.similarityscore, tc1.entryid AS entry1_id, re1.name AS file1_name, tc2.entryid AS entry2_id, re2.name AS file2_name, u1.id AS user1_id, u1.nick AS user1_nick, u2.id AS user2_id, u2.nick AS user2_nick FROM comparisonresults cr JOIN tokenizedcodes tc1 ON cr.code1id = tc1.id JOIN tokenizedcodes tc2 ON cr.code2id = tc2.id JOIN repo_entries re1 ON tc1.entryid = re1.id JOIN repo_entries re2 ON tc2.entryid = re2.id JOIN users u1 ON cr.user1 = u1.id JOIN users u2 ON cr.user2 = u2.id WHERE cr.similarityscore > 0.7::double precision ORDER BY cr.similarityscore DESC",
+      "materialized": false
+    }
+  },
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "tables": {
+      "user_interests": {
+        "columns": {
+          "category_ids": {
+            "isArray": true,
+            "dimensions": 1,
+            "rawType": "integer"
+          }
+        }
+      },
+      "user_friends": {
+        "columns": {
+          "friends": {
+            "isArray": true,
+            "dimensions": 1,
+            "rawType": "integer"
+          }
+        }
+      },
+      "user_blocked": {
+        "columns": {
+          "blocked_users": {
+            "isArray": true,
+            "dimensions": 1,
+            "rawType": "integer"
+          }
+        }
+      },
+      "user_with_interests": {
+        "columns": {
+          "interest_ids": {
+            "isArray": true,
+            "dimensions": 0,
+            "rawType": "integer"
+          },
+          "interest_names": {
+            "isArray": true,
+            "dimensions": 0,
+            "rawType": "text"
+          }
+        }
+      }
+    }
+  }
+}
