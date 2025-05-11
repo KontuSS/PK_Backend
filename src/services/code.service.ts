@@ -1,56 +1,66 @@
 import { db } from '../config/db.js';
-import { codeSubmissions } from '../models/schema.js';
+import { repoEntries, repositories, repositoryMetadata } from '../models/schema.js';
 import { eq, and } from 'drizzle-orm';
-import { PlagiarismChecker } from './plagiarism.service.js';
-import { StorageService } from './storage.service';
 
 export class CodeService {
-  // Save code submission
-  static async saveCode(
-    userId: string,
-    code: string,
-    language: string,
-    title?: string
-  ) {
-    const [submission] = await db.insert(codeSubmissions).values({
-      userId,
-      code,
-      language,
-      title: title || 'Untitled',
-      createdAt: new Date(),
-    }).returning();
+  static async getRepo(userId: number) {
 
-    return submission;
-  }
-
-  // Get user's code submissions
-  static async getUserSubmissions(userId: string) {
-    return db.query.codeSubmissions.findMany({
-      where: eq(codeSubmissions.userId, userId),
-      orderBy: (submissions, { desc }) => [desc(submissions.createdAt)],
-    });
-  }
-
-  // Share code with specific user
-  static async shareCode(submissionId: string, userId: string, targetUserId: string) {
-    const submission = await db.query.codeSubmissions.findFirst({
-      where: and(
-        eq(codeSubmissions.id, submissionId),
-        eq(codeSubmissions.userId, userId)
-      ),
+    const repo = await db.query.repositories.findFirst({
+      where: eq(repositories.userId, userId),
+      columns: {
+        id: true,
+        name: true,
+        description: true
+      },
+      with: {
+        repositoryMetadata: {
+          columns: {
+            totalFiles: true,
+            totalFolders: true,
+            totalSize: true,
+            createdAt: true,
+            lastModified: true,
+            license: true,
+            visibility: true
+          }
+        },
+      }
     });
 
-    if (!submission) throw new Error('Submission not found');
+    if (!repo){
+      throw new Error('Repo not found');
+    }
+    return repo;
+  }
 
-    // Create a shared copy
-    const [shared] = await db.insert(codeSubmissions).values({
-      ...submission,
-      userId: targetUserId,
-      shared: true,
-      originalSubmissionId: submissionId,
-      createdAt: new Date(),
-    }).returning();
+  static async getRepoContent(repositoryId: number){
+    const content = await db.query.repoEntries.findMany({
+      where: eq(repoEntries.repositoryId, repositoryId),
+      columns: {
+        id: true,
+        name: true,
+        parentId: true
+      },
+      with: {
+        repoEntriesData: {
+          columns: {
+            isDirectory: true,
+            extension: true,
+            content: true,
+            numberOfLines: true,
+            size: true,
+            lastModified: true,
+            createdAt: true
+          }
+        }
+      }
+    });
 
-    return shared;
+    return content;
+  }
+
+
+  static async uploadCode(userId: number, data: {}){
+    
   }
 }

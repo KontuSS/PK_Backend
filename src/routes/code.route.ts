@@ -1,17 +1,13 @@
 import { Hono } from 'hono';
-import { authMiddleware } from '../middlewares/auth.middleware';
-import {
-  uploadCode,
-  getCode,
-  checkPlagiarism,
-  updateCode,
-} from '../controllers/code.controller';
+import { authMiddleware } from '../middlewares/auth.middleware.js';
+import { CodeController } from '../controllers/code.controllers.js';
 
 const codeRoutes = new Hono();
 
-codeRoutes.post('/upload', authMiddleware, uploadCode);
-codeRoutes.get('/:id', authMiddleware, getCode);
-codeRoutes.post('/plagiarism', authMiddleware, checkPlagiarism);
-codeRoutes.put('/:id', authMiddleware, updateCode);
+codeRoutes.use('*', authMiddleware);
+
+codeRoutes.post('/upload', CodeController.uploadCode);
+codeRoutes.get('/repo', CodeController.getCode);
+codeRoutes.get('/repo/content', CodeController.getRepoContent);
 
 export default codeRoutes;

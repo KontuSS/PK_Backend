@@ -2,11 +2,11 @@ import { Hono } from 'hono';
 import { UserController } from '../controllers/user.controllers.js';
 import { authMiddleware } from '../middlewares/auth.middleware.js';
 
-const users = new Hono();
+const usersRoutes = new Hono();
 
-users.use('*', authMiddleware);
+usersRoutes.use('*', authMiddleware);
 
-users.get('/profile', UserController.getProfile);
-users.patch('/profile', UserController.updateProfile);
+usersRoutes.get('/profile', UserController.getProfile);
+usersRoutes.post('/profile', UserController.updateProfile);
 
-export default users;
+export default usersRoutes;
