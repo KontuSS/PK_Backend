@@ -1,15 +1,25 @@
 import { db } from '../config/db.js';
-import { conversationMessages, userFriendsView, userConversations } from '../models/schema.js';
-import { eq, and } from 'drizzle-orm';
+import { conversationMessages, userFriendsView, userConversations, messages } from '../models/schema.js';
+import { eq, and, asc, desc } from 'drizzle-orm';
 
 export class ChatService {
-  static async videoChatHandler(userId: number) {
-    const video = 0;
-    return video;
+  static async getAll(userId: number) {
+    const userConvs = await db
+      .select()
+      .from(userConversations)
+      .where(eq(userConversations.otherUserId, userId))
+      .orderBy(desc(userConversations.lastMessageAt));
+
+    return userConvs;
   }
 
-  static async textChatHandler(userId: number){
-    const chat = 0;
-    return chat;
+  static async getSingle(userId: number, conversationId: number){
+
+    const conversation = await db
+      .select().from(messages)
+      .where(eq(messages.conversationId, BigInt(conversationId)))
+      .orderBy(asc(messages.sentAt));
+
+    return conversation;
   }
 }

@@ -6,7 +6,10 @@ const chatRoutes = new Hono();
 
 chatRoutes.use('*', authMiddleware);
 
-chatRoutes.post('/video', ChatController.videoChat);
-chatRoutes.get('/chat', ChatController.textChat);
+// General chat
+chatRoutes.get('/userConversations', ChatController.getConversations);
+chatRoutes.get('/userConversations/:id', ChatController.getSingleConversation);
+
+//chatRoutes.post('/video', ChatController.videoChat);
 
 export default chatRoutes;

@@ -2,25 +2,24 @@ import type { Context } from 'hono';
 import { ChatService } from '../services/chat.service.js';
 
 export class ChatController {
-  static async videoChat(c: Context) {
+  static async getConversations(c: Context) {
     const userId = c.get('userId');
-    const video = await ChatService.videoChatHandler(userId);
 
-    if (!video) {
-      return c.json({ error: 'Error' }, 404);
-    }
+    const userConversations = await ChatService.getAll(userId);
 
-    return c.json(video);
+    return c.json(userConversations);
   }
 
-  static async textChat(c: Context){
+  static async getSingleConversation(c: Context){
+    const conversationId = Number(c.req.param('id'));
     const userId = c.get('userId');
-    const text = await ChatService.textChatHandler(userId);
 
-    if (!text) {
-      return c.json({ error: 'Error' }, 404);
-    }
+    const singleConversation = await ChatService.getSingle(userId, conversationId);
 
-    return c.json(text);
+    return c.json(singleConversation);
   }
 }
+
+    // if (!video) {
+    //   return c.json({ error: 'Error' }, 404);
+    // }

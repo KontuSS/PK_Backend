@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm/relations";
-import { users, userProfilePhoto, friendRequests, userInterests, userFriends, userBlocked, conversations, messages, repositories, repositoryMetadata, repoEntries, tokenizedcodes, comparisonresults, repoEntriesData } from "./schema";
+import { users, userProfilePhoto, friendRequests, userInterests, userFriends, userBlocked, conversations, messages, repositories, repositoryMetadata, repoEntries, tokenizedcodes, comparisonresults, repoEntriesData } from "./schema.js";
 
 export const userProfilePhotoRelations = relations(userProfilePhoto, ({one}) => ({
 	user: one(users, {
