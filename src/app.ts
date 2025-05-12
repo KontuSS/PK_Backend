@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
+import { serve } from '@hono/node-server';
+import { WebSocketServer } from 'ws';
 import authRoutes from './routes/auth.route.js';
 import userRoutes from './routes/user.route.js';
 import chatRoutes from './routes/chat.route.js';
@@ -9,7 +11,6 @@ import matchRoutes from './routes/match.route.js';
 import plagiarismRoutes from './routes/plagiarism.route.js';
 
 const app = new Hono();
-
 // Middlewares
 app.use('*', logger());
 app.use('*', cors({
