@@ -10,6 +10,7 @@ CREATE TABLE users (
   age             integer CHECK (age >=8 ),
   is_active       boolean DEFAULT false,
   created_at      timestamptz NOT NULL DEFAULT now()
+  fcmToken      text DEFAULT NULL,-- token 
 );
 
 CREATE TABLE user_profile_photo (
