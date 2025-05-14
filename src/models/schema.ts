@@ -19,6 +19,7 @@ export const users = pgTable("users", {
 	nick: text().notNull(),
 	bio: text(),
 	age: integer(),
+	fcmToken: text("fcm_token"),
 	isActive: boolean("is_active").default(false),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow().notNull(),
 }, (table) => [
