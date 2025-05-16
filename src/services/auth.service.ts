@@ -67,7 +67,7 @@ export class AuthService {
   }
 
   private static generateToken(userId: number): string {
-    return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '7d' });
+    return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '30d' });
   }
 
   static async verifyToken(token: string): Promise<number> {

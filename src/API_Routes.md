@@ -24,7 +24,7 @@
 
 - /auth: Chat generated, not checked
 - /user: Chat generated, good template but need to determine what to return on GET
-- /chat: Get all/single conversations
+- /chat: Get all/single conversations, first version model of send/recive
 - /code: Template build for repo display, need deeper database understanding
 - /matching: Completed, need testing
 - /plagiarism: None
