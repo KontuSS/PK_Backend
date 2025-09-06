@@ -2,24 +2,70 @@ import type { Context } from 'hono';
 import { ChatService } from '../services/chat.service.js';
 
 export class ChatController {
-  static async getConversations(c: Context) {
-    const userId = c.get('userId');
+  static async sendMessage(c: Context) {
+    try {
+      const userId = c.get('userId');
+      const { receiverId, message, messageType = 'text' } = await c.req.json();
 
-    const userConversations = await ChatService.getAll(userId);
+      if (!receiverId || !message) {
+        return c.json({ error: 'Receiver ID and message are required' }, 400);
+      }
 
-    return c.json(userConversations);
+      const contentBuffer = Buffer.from(message, messageType === 'text' ? 'utf-8' : 'base64');
+      
+      const sentMessage = await ChatService.sendMessage(
+        userId,
+        receiverId,
+        messageType,
+        contentBuffer
+      );
+
+      return c.json({ message: sentMessage });
+    } catch (error) {
+      console.error('Error sending message:', error);
+      return c.json({ error: 'Failed to send message' }, 500);
+    }
   }
 
-  static async getSingleConversation(c: Context){
-    const conversationId = Number(c.req.param('id'));
-    const userId = c.get('userId');
+  static async getConversations(c: Context) {
+    try {
+      const userId = c.get('userId');
+      const conversations = await ChatService.getConversations(userId);
+      
+      return c.json({ conversations });
+    } catch (error) {
+      console.error('Error getting conversations:', error);
+      return c.json({ error: 'Failed to get conversations' }, 500);
+    }
+  }
 
-    const singleConversation = await ChatService.getSingle(userId, conversationId);
+  static async getMessages(c: Context) {
+    try {
+      const userId = c.get('userId');
+      const conversationId = BigInt(c.req.param('conversationId'));
+      const limit = parseInt(c.req.query('limit') || '50');
+      const offset = parseInt(c.req.query('offset') || '0');
 
-    return c.json(singleConversation);
+      const messages = await ChatService.getMessages(conversationId, userId, limit, offset);
+      
+      return c.json({ messages });
+    } catch (error) {
+      console.error('Error getting messages:', error);
+      return c.json({ error: 'Failed to get messages' }, 500);
+    }
+  }
+
+  static async markAsRead(c: Context) {
+    try {
+      const userId = c.get('userId');
+      const conversationId = BigInt(c.req.param('conversationId'));
+
+      await ChatService.markAsRead(conversationId, userId);
+      
+      return c.json({ success: true });
+    } catch (error) {
+      console.error('Error marking as read:', error);
+      return c.json({ error: 'Failed to mark as read' }, 500);
+    }
   }
 }
-
-    // if (!video) {
-    //   return c.json({ error: 'Error' }, 404);
-    // }

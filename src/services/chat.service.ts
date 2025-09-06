@@ -1,138 +1,165 @@
 import { db } from '../config/db.js';
-import { userConversations, messages, conversations, users } from '../models/schema.js';
-import { eq, and, asc, desc, or } from 'drizzle-orm';
-import { sendFCMNotification } from './firebase.service.js';
+import { eq, and, desc, asc, or, count } from 'drizzle-orm';
+import { conversations, messages, users, userBlocked } from '../models/schema.js';
+import { FCMService } from './fcm.service.js';
 
 export class ChatService {
-  static async getAll(userId: number) {
-    const userConvs = await db
-      .select()
-      .from(userConversations)
-      .where(eq(userConversations.otherUserId, userId))
-      .orderBy(desc(userConversations.lastMessageAt));
-
-    return userConvs;
-  }
-
-  static async getSingle(userId: number, conversationId: number){
-
-    const conversation = await db
-      .select().from(messages)
-      .where(eq(messages.conversationId, BigInt(conversationId)))
-      .orderBy(asc(messages.sentAt));
-
-    return conversation;
-  }
-
-/**
-   * Wysyła wiadomość i powiadomienie FCM
-   * @param senderId ID nadawcy
-   * @param receiverId ID odbiorcy
-   * @param content Treść wiadomości
-   */
-  static async sendMessage(
-    senderId: number,
-    receiverId: number,
-    content: string
-  ) {
-    // 1. Zapisz wiadomość w bazie danych
-    const message = await this.saveMessageToDB(senderId, receiverId, content);
+  static async getOrCreateConversation(user1Id: number, user2Id: number) {
+    // Ensure consistent ordering to avoid duplicate conversations
+    const [smallerId, largerId] = [user1Id, user2Id].sort((a, b) => a - b);
     
-    // 2. Wyślij powiadomienie FCM
-    await this.sendNotification(receiverId, {
-      title: `Nowa wiadomość`,
-      body: this.formatMessagePreview(content),
-      data: {
-        type: 'new_message',
-        conversationId: conversations.id.toString(),
-        senderId: senderId.toString()
-      }
-    });
-
-    return {
-      message,
-      conversationId: conversations.id
-    };
-  }
-
-  /** Zapisuje wiadomość w bazie danych */
-  private static async saveMessageToDB(
-    senderId: number,
-    receiverId: number,
-    content: string
-  ) {
-    // Znajdź lub stwórz konwersację
     let conversation = await db.query.conversations.findFirst({
       where: and(
-        or(
-          and(
-            eq(conversations.user1Id, senderId),
-            eq(conversations.user2Id, receiverId)
-          ),
-          and(
-            eq(conversations.user1Id, receiverId),
-            eq(conversations.user2Id, senderId)
-          )
-        )
+        eq(conversations.user1Id, smallerId),
+        eq(conversations.user2Id, largerId)
       )
     });
 
     if (!conversation) {
       [conversation] = await db.insert(conversations)
         .values({
-          user1Id: Math.min(senderId, receiverId),
-          user2Id: Math.max(senderId, receiverId)
+          user1Id: smallerId,
+          user2Id: largerId
         })
         .returning();
     }
 
-    // Zapisz wiadomość
-    const [message] = await db.insert(messages)
-        .values({
-          conversationId: conversation.id,
-          senderId,
-          receiverId,
-          messageType: 'text', // Wymagane pole
-          content: Buffer.from(content),
-          // sentAt jest automatycznie ustawiany przez DEFAULT
-          isRead: false
-        })
-        .returning();
-
-    return {message, conversation};
+    return conversation;
   }
 
-  /** Wysyła powiadomienie FCM */
-  private static async sendNotification(
-    receiverId: number,
-    payload: {
-      title: string;
-      body: string;
-      data: Record<string, string>;
-    }
-  ) {
-    // Pobierz token FCM odbiorcy
-    const receiver = await db.query.users.findFirst({
-      where: eq(users.id, receiverId),
-      columns: { fcmToken: true }
+  static async sendMessage(senderId: number, receiverId: number, messageType: string, content: Buffer) {
+    // Check if receiver has blocked the sender
+    const blocked = await db.query.userBlocked.findFirst({
+      where: and(
+        eq(userBlocked.userId, receiverId),
+        eq(userBlocked.blockedUsers, [senderId])
+      )
     });
 
-    if (!receiver?.fcmToken) return false;
+    if (blocked) {
+      throw new Error('User has blocked you');
+    }
 
-    // Wyślij powiadomienie
-    return sendFCMNotification(
-      receiver.fcmToken,
-      { title: payload.title, body: payload.body },
-      payload.data
-    );
+    const conversation = await this.getOrCreateConversation(senderId, receiverId);
+
+    const [message] = await db.insert(messages)
+      .values({
+        conversationId: conversation.id,
+        senderId,
+        receiverId,
+        messageType,
+        content,
+        isRead: false
+      })
+      .returning();
+
+    // Send FCM notification
+    const sender = await db.query.users.findFirst({
+      where: eq(users.id, senderId),
+      columns: { firstName: true, lastName: true }
+    });
+
+    if (sender) {
+      const senderName = `${sender.firstName} ${sender.lastName}`;
+      const messageText = messageType === 'text' ? content.toString('utf-8') : 'New media message';
+      
+      await FCMService.sendChatNotification(
+        receiverId,
+        senderName,
+        messageText,
+        conversation.id.toString()
+      );
+    }
+
+    return message;
   }
 
-  /** Formatuje podgląd wiadomości dla powiadomienia */
-  private static formatMessagePreview(content: string): string {
-    return content.length > 50 
-      ? `${content.substring(0, 50)}...` 
-      : content;
+  static async getConversations(userId: number) {
+    const userConversations = await db.query.conversations.findMany({
+      where: or(
+        eq(conversations.user1Id, userId),
+        eq(conversations.user2Id, userId)
+      ),
+      with: {
+        user_user1Id: {
+          columns: { id: true, firstName: true, lastName: true, nick: true }
+        },
+        user_user2Id: {
+          columns: { id: true, firstName: true, lastName: true, nick: true }
+        },
+        messages: {
+          orderBy: desc(messages.sentAt),
+          limit: 1
+        }
+      }
+    });
+
+    return userConversations.map(async conv => ({
+      id: conv.id,
+      otherUser: conv.user1Id === userId ? conv.user_user2Id : conv.user_user1Id,
+      lastMessage: conv.messages[0],
+      unreadCount: await this.getUnreadCount(conv.id, userId)
+    }));
   }
 
+  static async getMessages(conversationId: bigint, userId: number, limit = 50, offset = 0) {
+    // Verify user is part of conversation
+    const conversation = await db.query.conversations.findFirst({
+      where: and(
+        eq(conversations.id, conversationId),
+        or(
+          eq(conversations.user1Id, userId),
+          eq(conversations.user2Id, userId)
+        ))
+    });
 
+    if (!conversation) {
+      throw new Error('Conversation not found');
+    }
+
+    const messagesList = await db.query.messages.findMany({
+      where: eq(messages.conversationId, conversationId),
+      orderBy: desc(messages.sentAt),
+      limit,
+      offset,
+      with: {
+        user_senderId: {
+          columns: { id: true, firstName: true, lastName: true, nick: true }
+        }
+      }
+    });
+
+    // Mark messages as read
+    await db.update(messages)
+      .set({ isRead: true })
+      .where(and(
+        eq(messages.conversationId, conversationId),
+        eq(messages.receiverId, userId),
+        eq(messages.isRead, false)
+      ));
+
+    return messagesList.reverse(); // Return in chronological order
+  }
+
+  static async getUnreadCount(conversationId: bigint, userId: number) {
+    const result = await db.select({ count: count() })
+      .from(messages)
+      .where(and(
+        eq(messages.conversationId, conversationId),
+        eq(messages.receiverId, userId),
+        eq(messages.isRead, false)
+      ));
+
+    return result[0]?.count || 0;
+  }
+
+  static async markAsRead(conversationId: bigint, userId: number) {
+    await db.update(messages)
+      .set({ isRead: true })
+      .where(and(
+        eq(messages.conversationId, conversationId),
+        eq(messages.receiverId, userId),
+        eq(messages.isRead, false)
+      ));
+  }
 }
