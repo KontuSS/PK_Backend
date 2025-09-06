@@ -1,5 +1,11 @@
 
---aktualnie skrypt nie dodadje przykładowych danych do tabeli TokenizedCodes,ComparisonResults-po storonie systemu antyplagiatowego oraz do repo_entries_metadata
+--aktualnie skrypt nie doINSERT INTO user_profile_photo (id, user_id, file_name, file_data, type)
+VALUES
+  (1, 1, 'alice_profile.jpg', '\xFFD8FFE000', 'image/jpeg'),
+  (2, 3, 'carol_profile.png', '\x89504E670D0A', 'image/png');
+
+-- Reset sequence for user_profile_photo
+SELECT setval('user_profile_photo_id_seq', 2, true);e przykładowych danych do tabeli TokenizedCodes,ComparisonResults-po storonie systemu antyplagiatowego oraz do repo_entries_metadata
 BEGIN;
 
 INSERT INTO intrests (id, name, description) VALUES
@@ -16,6 +22,10 @@ VALUES
   (3, 'carol@example.com',  'hash$carol', 'Carol', 'Nowak',     'caroln',  'IoT tinkerer',             30, TRUE),
   (4, 'dave@example.com',   'hash$dave',  'Dave',  'Smith',     'daves',   'CS undergrad / gamer',     22, TRUE),
   (5, 'eve@example.com',    'hash$eve',   'Eve',   'Wójcik',    'evew',    'Security researcher',      27, TRUE);
+
+-- Reset sequences so next IDs will be 6
+SELECT setval('intrests_id_seq', 5, true);
+SELECT setval('users_id_seq', 5, true);
 
 ------------------------------------------------------------
 -- 2.1 Profile photos (users 1 & 3)
@@ -197,6 +207,13 @@ INSERT INTO repo_entries_data VALUES
   (17, FALSE, 'py', 'class Block:', 120, 4096),
   (18, TRUE,  NULL, NULL, NULL, 0),
   (19, FALSE, 'kt', 'class MainActivity', 80, 2048);
+
+-- Reset all sequences to ensure next auto-generated IDs don't conflict
+SELECT setval('friend_requests_id_seq', 2, true);
+SELECT setval('conversations_id_seq', 2, true);
+SELECT setval('messages_id_seq', 6, true);
+SELECT setval('repositories_id_seq', 12, true);
+SELECT setval('repo_entries_id_seq', 19, true);
 
 COMMIT;
 

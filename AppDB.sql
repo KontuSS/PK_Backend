@@ -8,6 +8,7 @@ CREATE TABLE users (
   nick            text UNIQUE NOT NULL,
   bio             text,
   age             integer CHECK (age >=8 ),
+  fcm_token       text,
   is_active       boolean DEFAULT false,
   created_at      timestamptz NOT NULL DEFAULT now()
 );
