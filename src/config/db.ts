@@ -1,14 +1,15 @@
-import { Pool } from 'pg';
-import { drizzle } from 'drizzle-orm/node-postgres';
-import * as schema from '../models/schema.js';
+import { Pool } from "pg";
+import { drizzle } from "drizzle-orm/node-postgres";
+import * as schema from "../models/schema.js";
+import * as relations from "../models/relations.js";
 
 const pool = new Pool({
-  host: 'localhost',
+  host: "localhost",
   port: 5432,
-  user: 'app',
-  password: 'secret',
-  database: 'appdb',
+  user: "app",
+  password: "secret",
+  database: "appdb",
 });
 
-export const db = drizzle(pool, { schema });
+export const db = drizzle(pool, { schema: { ...schema, ...relations } });
 export type DbType = typeof db;
