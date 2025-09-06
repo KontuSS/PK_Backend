@@ -21,11 +21,31 @@ VALUES
   (2, 'bob@example.com',    'hash$bob',   'Bob',   'Kowalski', 'bobk',    'Full‑stack dev, climber',   28, TRUE),
   (3, 'carol@example.com',  'hash$carol', 'Carol', 'Nowak',     'caroln',  'IoT tinkerer',             30, TRUE),
   (4, 'dave@example.com',   'hash$dave',  'Dave',  'Smith',     'daves',   'CS undergrad / gamer',     22, TRUE),
-  (5, 'eve@example.com',    'hash$eve',   'Eve',   'Wójcik',    'evew',    'Security researcher',      27, TRUE);
+  (5, 'eve@example.com',    'hash$eve',   'Eve',   'Wójcik',    'evew',    'Security researcher',      27, TRUE),
+  (6, 'frank@example.com',  'hash$frank', 'Frank', 'Miller',   'frankm',  'Frontend developer & designer', 26, TRUE),
+  (7, 'grace@example.com',  'hash$grace', 'Grace', 'Davis',    'graced',  'Data scientist & AI enthusiast', 29, TRUE),
+  (8, 'henry@example.com',  'hash$henry', 'Henry', 'Wilson',   'henryw',  'Mobile app developer', 24, TRUE),
+  (9, 'iris@example.com',   'hash$iris',  'Iris',  'Brown',    'irisb',   'Blockchain developer', 31, TRUE),
+  (10, 'jack@example.com',  'hash$jack',  'Jack',  'Taylor',   'jackt',   'DevOps engineer', 33, TRUE),
+  (11, 'kate@example.com',  'hash$kate',  'Kate',  'Anderson', 'katea',   'UI/UX designer', 27, TRUE),
+  (12, 'liam@example.com',  'hash$liam',  'Liam',  'Thomas',   'liamt',   'Backend developer', 25, TRUE),
+  (13, 'mia@example.com',   'hash$mia',   'Mia',   'Jackson',  'miaj',    'Product manager', 32, TRUE),
+  (14, 'noah@example.com',  'hash$noah',  'Noah',  'White',    'noahw',   'Software architect', 35, TRUE),
+  (15, 'olivia@example.com', 'hash$olivia', 'Olivia', 'Harris', 'oliviah', 'Machine learning researcher', 28, TRUE),
+  (16, 'peter@example.com', 'hash$peter', 'Peter', 'Martin',   'peterm',  'Game developer', 26, TRUE),
+  (17, 'quinn@example.com', 'hash$quinn', 'Quinn', 'Garcia',   'quinng',  'Cybersecurity analyst', 30, TRUE),
+  (18, 'ruby@example.com',  'hash$ruby',  'Ruby',  'Rodriguez', 'rubyr',  'Full-stack developer', 24, TRUE),
+  (19, 'sam@example.com',   'hash$sam',   'Sam',   'Lewis',    'saml',    'Cloud engineer', 29, TRUE),
+  (20, 'tina@example.com',  'hash$tina',  'Tina',  'Lee',      'tinal',   'QA engineer', 27, TRUE),
+  (21, 'uma@example.com',   'hash$uma',   'Uma',   'Walker',   'umaw',    'Technical writer', 31, TRUE),
+  (22, 'victor@example.com', 'hash$victor', 'Victor', 'Hall',   'victorh', 'Database administrator', 34, TRUE),
+  (23, 'wendy@example.com', 'hash$wendy', 'Wendy', 'Allen',    'wendya',  'Systems analyst', 28, TRUE),
+  (24, 'xander@example.com', 'hash$xander', 'Xander', 'Young',  'xandery', 'Network engineer', 30, TRUE),
+  (25, 'yara@example.com',  'hash$yara',  'Yara',  'King',     'arak',    'Software tester', 26, TRUE);
 
--- Reset sequences so next IDs will be 6
+-- Reset sequences so next IDs will be 26
 SELECT setval('intrests_id_seq', 5, true);
-SELECT setval('users_id_seq', 5, true);
+SELECT setval('users_id_seq', 25, true);
 
 ------------------------------------------------------------
 -- 2.1 Profile photos (users 1 & 3)
@@ -43,7 +63,27 @@ INSERT INTO user_interests (user_id, category_ids) VALUES
   (2, '{1,4}'),     -- Bob: Python, Web Dev
   (3, '{1,3}'),     -- Carol: Python, Open‑Source HW
   (4, '{1,5}'),     -- Dave: Python, Cyber‑security
-  (5, '{1,2,5}');   -- Eve: Python, ML, Cyber‑security
+  (5, '{1,2,5}'),   -- Eve: Python, ML, Cyber‑security
+  (6, '{1,4}'),     -- Frank: Python, Web Dev
+  (7, '{1,2}'),     -- Grace: Python, ML
+  (8, '{1,4}'),     -- Henry: Python, Web Dev
+  (9, '{1,5}'),     -- Iris: Python, Cyber‑security
+  (10, '{1,4}'),    -- Jack: Python, Web Dev
+  (11, '{4}'),      -- Kate: Web Dev
+  (12, '{1,4}'),    -- Liam: Python, Web Dev
+  (13, '{4}'),      -- Mia: Web Dev
+  (14, '{1}'),      -- Noah: Python
+  (15, '{1,2}'),    -- Olivia: Python, ML
+  (16, '{1}'),      -- Peter: Python
+  (17, '{1,5}'),    -- Quinn: Python, Cyber‑security
+  (18, '{1,4}'),    -- Ruby: Python, Web Dev
+  (19, '{1}'),      -- Sam: Python
+  (20, '{1,4}'),    -- Tina: Python, Web Dev
+  (21, '{4}'),      -- Uma: Web Dev
+  (22, '{1}'),      -- Victor: Python
+  (23, '{1}'),      -- Wendy: Python
+  (24, '{1,5}'),    -- Xander: Python, Cyber‑security
+  (25, '{1,4}');    -- Yara: Python, Web Dev
 
 ------------------------------------------------------------
 -- 3. Friend relations

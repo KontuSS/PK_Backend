@@ -7,8 +7,18 @@ export class MatchController {
     const usersMatched = await MatchService.getMatches(userId);
 
     if (!usersMatched) {
-      return c.json({ error: "Error" }, 424);
+      return c.json({ error: "Error" }, 404);
     }
     return c.json(usersMatched);
+  }
+
+  static async getRandomUsersForMatching(c: Context) {
+    const userId = c.get("userId");
+    const randomUsers = await MatchService.getRandomUsersForMatching(userId);
+
+    if (!randomUsers) {
+      return c.json({ error: "Error fetching random users" }, 404);
+    }
+    return c.json(randomUsers);
   }
 }
