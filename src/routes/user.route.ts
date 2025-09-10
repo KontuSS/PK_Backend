@@ -7,6 +7,7 @@ const usersRoutes = new Hono();
 usersRoutes.use("*", authMiddleware);
 
 usersRoutes.get("/profile", UserController.getProfile);
-usersRoutes.post("/profile/update", UserController.updateProfile);
+usersRoutes.post("/update", UserController.updateProfile);
+usersRoutes.get("/interests", UserController.getAllInterests);
 
 export default usersRoutes;

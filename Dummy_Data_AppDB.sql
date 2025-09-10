@@ -1,11 +1,5 @@
 
---aktualnie skrypt nie doINSERT INTO user_profile_photo (id, user_id, file_name, file_data, type)
-VALUES
-  (1, 1, 'alice_profile.jpg', '\xFFD8FFE000', 'image/jpeg'),
-  (2, 3, 'carol_profile.png', '\x89504E670D0A', 'image/png');
-
--- Reset sequence for user_profile_photo
-SELECT setval('user_profile_photo_id_seq', 2, true);e przykładowych danych do tabeli TokenizedCodes,ComparisonResults-po storonie systemu antyplagiatowego oraz do repo_entries_metadata
+--aktualnie skrypt nie dodaje przykładowych danych do tabeli TokenizedCodes,ComparisonResults-po storonie systemu antyplagiatowego oraz do repo_entries_metadata
 BEGIN;
 
 INSERT INTO intrests (id, name, description) VALUES

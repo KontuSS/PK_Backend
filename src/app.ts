@@ -21,7 +21,7 @@ app.use(
 
 // Routes
 app.route("/auth", authRoutes);
-app.route("/users", userRoutes);
+app.route("/user", userRoutes);
 app.route("/chat", chatRoutes);
 app.route("/code", codeRoutes);
 app.route("/matching", matchRoutes);
