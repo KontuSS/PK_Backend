@@ -1,6 +1,5 @@
 import type { Context } from "hono";
 import { SimpleFileService } from "../services/simple-file.service.js";
-import { upload } from "../middlewares/simple-multer.middleware.js";
 import { promises as fs } from "fs";
 import path from "path";
 
@@ -12,60 +11,100 @@ export class SimpleFileController {
     try {
       const userId = c.get("userId");
 
-      return new Promise((resolve) => {
-        const multerUpload = upload.single("file");
+      // Parse multipart form data using Hono's built-in parser
+      const body = await c.req.parseBody();
+      const file = body.file as File;
 
-        multerUpload(c.req.raw as any, c.res as any, async (err: any) => {
-          if (err) {
-            console.error("Multer upload error:", err);
-            return resolve(c.json({ error: err.message }, 400));
-          }
+      if (!file || !(file instanceof File)) {
+        return c.json({ error: "No file uploaded" }, 400);
+      }
 
-          const file = (c.req.raw as any).file;
+      // Validate file extension
+      const allowedExtensions = [
+        ".py",
+        ".js",
+        ".ts",
+        ".java",
+        ".cpp",
+        ".c",
+        ".html",
+        ".css",
+        ".json",
+        ".xml",
+        ".md",
+      ];
+      const fileExt = path.extname(file.name).toLowerCase();
 
-          if (!file) {
-            return resolve(c.json({ error: "No file uploaded" }, 400));
-          }
+      if (!allowedExtensions.includes(fileExt)) {
+        return c.json(
+          {
+            error: `File type ${fileExt} not allowed. Only coding files are supported.`,
+          },
+          400
+        );
+      }
 
-          try {
-            // Save file info to database
-            const fileRecord = await SimpleFileService.uploadUserFile(
-              userId,
-              file.originalname,
-              file.path,
-              file.size,
-              file.mimetype
-            );
+      // Validate file size (10MB limit)
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      if (file.size > maxSize) {
+        return c.json(
+          {
+            error: `File size too large. Maximum size is ${
+              maxSize / 1024 / 1024
+            }MB`,
+          },
+          400
+        );
+      }
 
-            return resolve(
-              c.json(
-                {
-                  success: true,
-                  message: "File uploaded successfully",
-                  file: {
-                    id: fileRecord.id,
-                    fileName: fileRecord.fileName,
-                    fileSize: fileRecord.fileSize,
-                    mimeType: fileRecord.mimeType,
-                    uploadedAt: fileRecord.uploadedAt,
-                  },
-                },
-                201
-              )
-            );
-          } catch (serviceError: any) {
-            // Clean up uploaded file if database operation fails
-            try {
-              await fs.unlink(file.path);
-            } catch (unlinkError) {
-              console.error("Error cleaning up file:", unlinkError);
-            }
+      // Create upload directory if it doesn't exist
+      const uploadDir = path.join(process.cwd(), "uploads", "user-files");
+      await fs.mkdir(uploadDir, { recursive: true });
 
-            console.error("Error saving file info:", serviceError);
-            return resolve(c.json({ error: "Failed to save file" }, 500));
-          }
-        });
-      }) as Promise<Response>;
+      // Generate unique filename
+      const timestamp = Date.now();
+      const fileName = `${timestamp}-${file.name}`;
+      const filePath = path.join(uploadDir, fileName);
+
+      // Save file to disk
+      const arrayBuffer = await file.arrayBuffer();
+      await fs.writeFile(filePath, Buffer.from(arrayBuffer));
+
+      try {
+        // Save file info to database
+        const fileRecord = await SimpleFileService.uploadUserFile(
+          userId,
+          file.name,
+          filePath,
+          file.size,
+          file.type
+        );
+
+        return c.json(
+          {
+            success: true,
+            message: "File uploaded successfully",
+            file: {
+              id: fileRecord.id,
+              fileName: fileRecord.fileName,
+              fileSize: fileRecord.fileSize,
+              mimeType: fileRecord.mimeType,
+              uploadedAt: fileRecord.uploadedAt,
+            },
+          },
+          201
+        );
+      } catch (serviceError: any) {
+        // Clean up uploaded file if database operation fails
+        try {
+          await fs.unlink(filePath);
+        } catch (unlinkError) {
+          console.error("Error cleaning up file:", unlinkError);
+        }
+
+        console.error("Error saving file info:", serviceError);
+        return c.json({ error: "Failed to save file" }, 500);
+      }
     } catch (error: any) {
       console.error("Error in uploadFile:", error);
       return c.json({ error: "Failed to upload file" }, 500);
