@@ -7,6 +7,7 @@ import chatRoutes from "./routes/chat.route.js";
 import codeRoutes from "./routes/code.route.js";
 import matchRoutes from "./routes/match.route.js";
 import plagiarismRoutes from "./routes/plagiarism.route.js";
+import simpleFileRoutes from "./routes/simple-file.route.js";
 
 const app = new Hono();
 // Middlewares
@@ -26,6 +27,7 @@ app.route("/chat", chatRoutes);
 app.route("/code", codeRoutes);
 app.route("/matching", matchRoutes);
 app.route("/plagiarism", plagiarismRoutes);
+app.route("/files", simpleFileRoutes); // Simple file upload/download
 
 // Health check
 app.get("/", (c) => c.text("API is running"));

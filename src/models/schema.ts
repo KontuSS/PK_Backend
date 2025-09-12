@@ -239,6 +239,24 @@ export const comparisonresults = pgTable("comparisonresults", {
 		}).onDelete("cascade"),
 ]);
 
+// Simple user files table - ONE USER = ONE FILE
+export const userFiles = pgTable("user_files", {
+	id: serial().primaryKey().notNull(),
+	userId: integer("user_id").notNull(),
+	fileName: text("file_name").notNull(),
+	filePath: text("file_path").notNull(), // Path to uploaded file
+	fileSize: integer("file_size").notNull(),
+	mimeType: text("mime_type"),
+	uploadedAt: timestamp("uploaded_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+}, (table) => [
+	foreignKey({
+			columns: [table.userId],
+			foreignColumns: [users.id],
+			name: "user_files_user_id_fkey"
+		}).onDelete("cascade"),
+	unique("user_files_user_id_key").on(table.userId), // One file per user
+]);
+
 export const repoEntriesData = pgTable("repo_entries_data", {
 	entryId: serial("entry_id").primaryKey().notNull(),
 	isDirectory: boolean("is_directory").default(false).notNull(),
@@ -246,6 +264,7 @@ export const repoEntriesData = pgTable("repo_entries_data", {
 	content: text(),
 	numberOfLines: integer("number_of_lines"),
 	size: integer(),
+	filePath: text("file_path"), // Path to uploaded file for multer files
 	lastModified: timestamp("last_modified", { withTimezone: true, mode: 'string' }).defaultNow(),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
 }, (table) => [

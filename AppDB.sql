@@ -1133,3 +1133,17 @@ WHERE
   cr.SimilarityScore > 0.7 -- High similarity threshold
 ORDER BY 
   cr.SimilarityScore DESC;
+
+-- USER FILES - Simple file upload system (one file per user)
+CREATE TABLE user_files (
+  id              serial PRIMARY KEY,
+  user_id         serial UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  file_name       text NOT NULL,
+  file_path       text NOT NULL,
+  file_size       integer NOT NULL CHECK (file_size > 0),
+  mime_type       text NOT NULL,
+  uploaded_at     timestamptz NOT NULL DEFAULT now()
+);
+
+-- Index for faster lookups by user_id
+CREATE INDEX idx_user_files_user_id ON user_files(user_id);
