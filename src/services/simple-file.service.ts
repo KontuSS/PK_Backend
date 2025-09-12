@@ -1,7 +1,7 @@
-import { db } from '../config/db.js';
-import { userFiles } from '../models/schema.js';
-import { eq } from 'drizzle-orm';
-import { promises as fs } from 'fs';
+import { db } from "../config/db.js";
+import { userFiles } from "../models/schema.js";
+import { eq } from "drizzle-orm";
+import { promises as fs } from "fs";
 
 export class SimpleFileService {
   /**
@@ -16,7 +16,7 @@ export class SimpleFileService {
   ) {
     // Check if user already has a file
     const existingFile = await db.query.userFiles.findFirst({
-      where: eq(userFiles.userId, userId)
+      where: eq(userFiles.userId, userId),
     });
 
     if (existingFile) {
@@ -24,17 +24,18 @@ export class SimpleFileService {
       try {
         await fs.unlink(existingFile.filePath);
       } catch (error) {
-        console.warn('Could not delete old file:', error);
+        console.warn("Could not delete old file:", error);
       }
 
       // Update existing record
-      const updatedFile = await db.update(userFiles)
+      const updatedFile = await db
+        .update(userFiles)
         .set({
           fileName,
           filePath,
           fileSize,
           mimeType,
-          uploadedAt: new Date().toISOString()
+          uploadedAt: new Date().toISOString(),
         })
         .where(eq(userFiles.userId, userId))
         .returning();
@@ -42,13 +43,14 @@ export class SimpleFileService {
       return updatedFile[0];
     } else {
       // Insert new file record
-      const insertedFile = await db.insert(userFiles)
+      const insertedFile = await db
+        .insert(userFiles)
         .values({
           userId,
           fileName,
           filePath,
           fileSize,
-          mimeType
+          mimeType,
         })
         .returning();
 
@@ -61,11 +63,11 @@ export class SimpleFileService {
    */
   static async getUserFile(userId: number) {
     const file = await db.query.userFiles.findFirst({
-      where: eq(userFiles.userId, userId)
+      where: eq(userFiles.userId, userId),
     });
 
     if (!file) {
-      throw new Error('User has no uploaded file');
+      throw new Error("User has no uploaded file");
     }
 
     return file;
@@ -76,11 +78,11 @@ export class SimpleFileService {
    */
   static async getFileByUserId(userId: number) {
     const file = await db.query.userFiles.findFirst({
-      where: eq(userFiles.userId, userId)
+      where: eq(userFiles.userId, userId),
     });
 
     if (!file) {
-      throw new Error('User has no uploaded file');
+      throw new Error("User has no uploaded file");
     }
 
     return file;
@@ -91,24 +93,24 @@ export class SimpleFileService {
    */
   static async deleteUserFile(userId: number) {
     const existingFile = await db.query.userFiles.findFirst({
-      where: eq(userFiles.userId, userId)
+      where: eq(userFiles.userId, userId),
     });
 
     if (!existingFile) {
-      throw new Error('User has no uploaded file');
+      throw new Error("User has no uploaded file");
     }
 
     // Delete file from disk
     try {
       await fs.unlink(existingFile.filePath);
     } catch (error) {
-      console.warn('Could not delete file from disk:', error);
+      console.warn("Could not delete file from disk:", error);
     }
 
     // Delete record from database
     await db.delete(userFiles).where(eq(userFiles.userId, userId));
 
-    return { message: 'File deleted successfully' };
+    return { message: "File deleted successfully" };
   }
 
   /**
@@ -122,10 +124,10 @@ export class SimpleFileService {
             id: true,
             firstName: true,
             lastName: true,
-            nick: true
-          }
-        }
-      }
+            nick: true,
+          },
+        },
+      },
     });
 
     return files;

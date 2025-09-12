@@ -4,7 +4,6 @@ import { logger } from "hono/logger";
 import authRoutes from "./routes/auth.route.js";
 import userRoutes from "./routes/user.route.js";
 import chatRoutes from "./routes/chat.route.js";
-import codeRoutes from "./routes/code.route.js";
 import matchRoutes from "./routes/match.route.js";
 import plagiarismRoutes from "./routes/plagiarism.route.js";
 import simpleFileRoutes from "./routes/simple-file.route.js";
@@ -24,7 +23,6 @@ app.use(
 app.route("/auth", authRoutes);
 app.route("/user", userRoutes);
 app.route("/chat", chatRoutes);
-app.route("/code", codeRoutes);
 app.route("/matching", matchRoutes);
 app.route("/plagiarism", plagiarismRoutes);
 app.route("/files", simpleFileRoutes); // Simple file upload/download
