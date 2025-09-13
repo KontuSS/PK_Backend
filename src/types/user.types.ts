@@ -23,3 +23,15 @@ export type UserProfileUpdate = {
   age?: number;
   interests?: number[]; // Array of interest IDs
 };
+
+// Types for user-specific file operations
+export interface UserFileData {
+  id: string;
+  fileName: string;
+  fileUrl: string;
+  fileType: string;
+  fileSize: number;
+  uploadedAt: string;
+  userId: number;
+  isPublic: boolean;
+}

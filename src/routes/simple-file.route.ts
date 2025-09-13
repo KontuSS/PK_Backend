@@ -16,6 +16,10 @@ simpleFileRoutes.delete("/my-file", SimpleFileController.deleteMyFile); // Delet
 
 // Browse other users' files
 simpleFileRoutes.get("/users", SimpleFileController.getAllUsersWithFiles); // List all users with files
+simpleFileRoutes.get(
+  "/user/:userId/file-info",
+  SimpleFileController.getUserFileInfo
+); // Get user's file info
 simpleFileRoutes.get("/user/:userId/view", SimpleFileController.viewUserFile); // View user's file
 simpleFileRoutes.get(
   "/user/:userId/download",

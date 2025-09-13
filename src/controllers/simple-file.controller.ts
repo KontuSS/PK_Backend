@@ -2,6 +2,7 @@ import type { Context } from "hono";
 import { SimpleFileService } from "../services/simple-file.service.js";
 import { promises as fs } from "fs";
 import path from "path";
+import type { UserFileData } from "../types/user.types.js";
 
 export class SimpleFileController {
   /**
@@ -295,6 +296,65 @@ export class SimpleFileController {
     } catch (error: any) {
       console.error("Error getting users with files:", error);
       return c.json({ error: "Failed to get users with files" }, 500);
+    }
+  }
+
+  /**
+   * Get user file info by user ID (public info access)
+   */
+  static async getUserFileInfo(c: Context) {
+    try {
+      const targetUserId = Number(c.req.param("userId"));
+
+      if (isNaN(targetUserId)) {
+        return c.json({ error: "Invalid user ID" }, 400);
+      }
+
+      const file = await SimpleFileService.getFileByUserId(targetUserId);
+
+      // Create file URL for viewing/downloading
+      const baseUrl = `${c.req.url.split("/files")[0]}/files`;
+      const fileUrl = `${baseUrl}/user/${targetUserId}/view`;
+
+      // Determine file type from extension
+      const extension = path.extname(file.fileName).toLowerCase();
+      const fileTypeMap: Record<string, string> = {
+        ".py": "python",
+        ".js": "javascript",
+        ".ts": "typescript",
+        ".java": "java",
+        ".cpp": "cpp",
+        ".c": "c",
+        ".html": "html",
+        ".css": "css",
+        ".json": "json",
+        ".xml": "xml",
+        ".md": "markdown",
+      };
+
+      const userFileData: UserFileData = {
+        id: file.id.toString(),
+        fileName: file.fileName,
+        fileUrl: fileUrl,
+        fileType: fileTypeMap[extension] || "text",
+        fileSize: file.fileSize,
+        uploadedAt: file.uploadedAt || new Date().toISOString(),
+        userId: file.userId,
+        isPublic: true, // All files are public in this system
+      };
+
+      return c.json({
+        success: true,
+        file: userFileData,
+      });
+    } catch (error: any) {
+      console.error("Error getting user file info:", error);
+
+      if (error.message === "User has no uploaded file") {
+        return c.json({ error: "User has no file uploaded" }, 404);
+      }
+
+      return c.json({ error: "Failed to get file info" }, 500);
     }
   }
 }
