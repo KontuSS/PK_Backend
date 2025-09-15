@@ -1,10 +1,14 @@
-import { Context } from "hono";
+import type { Context } from "hono";
 import { PlagiarismService } from "../services/plagiarism.service.js";
 
 export class PlagiarismController {
   static async compareUsers(c: Context) {
     try {
-      const body = await c.req.json<{ user1Id: number; user2Id: number; threshold?: number }>();
+      const body = await c.req.json<{
+        user1Id: number;
+        user2Id: number;
+        threshold?: number;
+      }>();
       if (!body.user1Id || !body.user2Id) {
         return c.json({ error: "user1Id and user2Id are required" }, 400);
       }

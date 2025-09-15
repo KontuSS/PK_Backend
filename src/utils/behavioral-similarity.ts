@@ -1,6 +1,10 @@
 import { parse } from "@babel/parser";
 import traverse from "@babel/traverse";
 
+// Fix for TypeScript/ES module compatibility with @babel/traverse
+const traverseDefault =
+  typeof traverse === "function" ? traverse : (traverse as any).default;
+
 /**
  * Extract behavioral/semantic features from code.
  * Focuses on control flow, calls, operators. Ignores identifiers/formatting.
@@ -13,8 +17,8 @@ function extractFeatures(code: string): string[] {
 
   const feats: string[] = [];
 
-  traverse(ast, {
-    enter(path) {
+  traverseDefault(ast, {
+    enter(path: any) {
       switch (path.node.type) {
         case "IfStatement":
           feats.push("if");

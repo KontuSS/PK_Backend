@@ -8,6 +8,8 @@
     "load-db": "node src/scripts/loadDB.cjs"
   },
   "dependencies": {
+    "@babel/parser": "^7.28.4",
+    "@babel/traverse": "^7.28.4",
     "@hono/node-server": "^1.14.1",
     "axios": "^1.9.0",
     "babel": "^5.8.38",
@@ -23,6 +25,8 @@
     "ws": "^8.18.2"
   },
   "devDependencies": {
+    "@types/babel__parser": "^7.0.0",
+    "@types/babel__traverse": "^7.28.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^20.17.46",

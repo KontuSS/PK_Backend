@@ -140,7 +140,29 @@ export class MatchService {
       const shuffled = availableUsers.sort(() => 0.5 - Math.random());
       const randomUsers = shuffled.slice(0, 10);
 
-      return randomUsers;
+      // Get interests for each random user
+      const userIds = randomUsers.map((user) => user.id);
+      const usersWithInterests = await db.query.userInterests.findMany({
+        where: inArray(userInterests.userId, userIds),
+        columns: {
+          userId: true,
+          categoryIds: true,
+        },
+      });
+
+      // Create a map of userId to interests for quick lookup
+      const interestsMap = new Map();
+      usersWithInterests.forEach((userInterest) => {
+        interestsMap.set(userInterest.userId, userInterest.categoryIds || []);
+      });
+
+      // Add interests to each user
+      const randomUsersWithInterests = randomUsers.map((user) => ({
+        ...user,
+        interests: interestsMap.get(user.id) || [],
+      }));
+
+      return randomUsersWithInterests;
     } catch (error) {
       console.error("Error fetching random users:", error);
       return null;
