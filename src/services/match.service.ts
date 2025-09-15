@@ -1,10 +1,11 @@
 import { db } from "../config/db.js";
-import { eq, and, inArray } from "drizzle-orm";
+import { eq, and, inArray, sql } from "drizzle-orm";
 import {
   userInterests,
   users,
   userFriends,
   userBlocked,
+  conversations,
 } from "../models/schema.js";
 import {} from "../utils/match.utils.js";
 
@@ -166,6 +167,116 @@ export class MatchService {
     } catch (error) {
       console.error("Error fetching random users:", error);
       return null;
+    }
+  }
+
+  static async createMatch(userId: number, targetUserId: number) {
+    try {
+      // Validate that both users exist
+      const [user, targetUser] = await Promise.all([
+        db.query.users.findFirst({
+          where: eq(users.id, userId),
+          columns: { id: true, nick: true },
+        }),
+        db.query.users.findFirst({
+          where: eq(users.id, targetUserId),
+          columns: { id: true, nick: true },
+        }),
+      ]);
+
+      if (!user || !targetUser) {
+        throw new Error("One or both users not found");
+      }
+
+      // Check if they are already friends
+      const userFriendList = await db.query.userFriends.findFirst({
+        where: eq(userFriends.userId, userId),
+        columns: { friends: true },
+      });
+
+      const currentFriends = userFriendList?.friends || [];
+      if (currentFriends.includes(targetUserId)) {
+        throw new Error("Users are already matched/friends");
+      }
+
+      // Get target user's current friends
+      const targetFriendList = await db.query.userFriends.findFirst({
+        where: eq(userFriends.userId, targetUserId),
+        columns: { friends: true },
+      });
+
+      const targetCurrentFriends = targetFriendList?.friends || [];
+
+      // Update both users' friend lists using simple array operations
+      await Promise.all([
+        // Update user's friends
+        db
+          .insert(userFriends)
+          .values({
+            userId: userId,
+            friends: [...currentFriends, targetUserId],
+          })
+          .onConflictDoUpdate({
+            target: userFriends.userId,
+            set: {
+              friends: [...currentFriends, targetUserId],
+            },
+          }),
+
+        // Update target user's friends
+        db
+          .insert(userFriends)
+          .values({
+            userId: targetUserId,
+            friends: [...targetCurrentFriends, userId],
+          })
+          .onConflictDoUpdate({
+            target: userFriends.userId,
+            set: {
+              friends: [...targetCurrentFriends, userId],
+            },
+          }),
+      ]);
+
+      // Create a conversation between them so they appear in each other's conversations
+      const user1Id = Math.min(userId, targetUserId);
+      const user2Id = Math.max(userId, targetUserId);
+
+      try {
+        await db
+          .insert(conversations)
+          .values({
+            user1Id,
+            user2Id,
+          })
+          .onConflictDoNothing();
+
+        // Return success without the conversation ID to avoid BigInt issues
+        return {
+          success: true,
+          message: "Match created successfully",
+          match: {
+            userId,
+            targetUserId,
+            conversationCreated: true,
+          },
+        };
+      } catch (convError) {
+        console.error("Error creating conversation:", convError);
+        // Still return success since the friendship was created
+        return {
+          success: true,
+          message: "Match created successfully (conversation setup pending)",
+          match: {
+            userId,
+            targetUserId,
+            conversationCreated: false,
+          },
+        };
+      }
+    } catch (error: any) {
+      console.error("Error creating match:", error);
+      throw error;
     }
   }
 }

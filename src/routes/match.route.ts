@@ -10,4 +10,6 @@ matchRoutes.get("/matchGet", MatchController.getMatches);
 
 matchRoutes.get("/random", MatchController.getRandomUsersForMatching);
 
+matchRoutes.post("/create", MatchController.createMatch);
+
 export default matchRoutes;
